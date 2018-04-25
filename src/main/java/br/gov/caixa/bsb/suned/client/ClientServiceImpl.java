@@ -51,6 +51,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public Client login(Client client) throws ClientException {
+    	return client;
     }
 
 }
