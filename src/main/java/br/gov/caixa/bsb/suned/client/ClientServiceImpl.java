@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import br.gov.caixa.bsb.suned.client.ClientRepository;
 import br.gov.caixa.bsb.suned.client.ClientService;
 import br.gov.caixa.bsb.suned.phone.PhoneRepository;
-import main.java.br.gov.caixa.bsb.suned.client.exception.ClientException;
+import main.java.br.gov.caixa.bsb.suned.client.exception.CadastroException;
+import main.java.br.gov.caixa.bsb.suned.client.exception.LoginException;
 import br.gov.caixa.bsb.suned.client.Client;
 
 public class ClientServiceImpl implements ClientService {
@@ -22,18 +23,18 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client save(Client client) throws ClientException {
+    public Client save(Client client) throws CadastroException {
     	if (client.getName() == null || client.getName().equals(""))
-    		throw new ClientException("Nome do usuario nao informado");
+    		throw new CadastroException("Nome do usuario nao informado");
     	
     	if (client.getEmail() == null || client.getEmail().equals(""))
-    		throw new ClientException("Email nao informado");
+    		throw new CadastroException("Email nao informado");
     	
     	if (client.getPassword() == null || client.getPassword().equals(""))
-    		throw new ClientException("Senha nao informada");
+    		throw new CadastroException("Senha nao informada");
     	
     	if (clientRepository.findByEmail(client.getEmail()) != null)
-    		throw new ClientException("E-mail ja existente");
+    		throw new CadastroException("E-mail ja existente");
     	
     	client.setId(UUID.randomUUID().toString());
     	client.setCreated(new Date());
@@ -50,8 +51,15 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client login(Client client) throws ClientException {
-    	return client;
+    public Client login(Client client) throws LoginException {
+    	Client dbClient = clientRepository.findByEmail(client.getEmail());
+    	if (dbClient == null)
+    		throw new LoginException("Usuario e/ou senha invalidos");
+    	
+    	if (!dbClient.getPassword().equals(client.getPassword())) 
+    		throw new LoginException("Usuario e/ou senha invalidos");
+    	
+    	return dbClient;
     }
 
 }

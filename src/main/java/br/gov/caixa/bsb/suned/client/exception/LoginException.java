@@ -1,12 +1,12 @@
 package main.java.br.gov.caixa.bsb.suned.client.exception;
 
-public class ClientException extends Exception {
+public class LoginException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
 	private String mensagem;
 	
-	public ClientException(String message) {
+	public LoginException(String message) {
 		super();
 		this.mensagem = message;
 	}
@@ -18,5 +18,4 @@ public class ClientException extends Exception {
 	public void setMessage(String message) {
 		this.mensagem = message;
 	}
-	
 }

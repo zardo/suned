@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.gov.caixa.bsb.suned.client.ClientRepository;
 import main.java.br.gov.caixa.bsb.suned.JSONError;
-import main.java.br.gov.caixa.bsb.suned.client.exception.ClientException;
+import main.java.br.gov.caixa.bsb.suned.client.exception.CadastroException;
+import main.java.br.gov.caixa.bsb.suned.client.exception.LoginException;
 import br.gov.caixa.bsb.suned.client.Client;
 
 @RestController
@@ -30,19 +31,25 @@ public class ClientController {
 
     @ResponseStatus(code=HttpStatus.CREATED)
     @PostMapping(path = "cadastro", headers={"content-type=application/json"})
-    public Client register(@Valid @RequestBody Client client) throws ClientException {
+    public Client register(@Valid @RequestBody Client client) throws CadastroException {
         return clientService.save(client);
     }
 
     @ResponseStatus(code=HttpStatus.CREATED)
     @PostMapping(path = "login", headers={"content-type=application/json"})
-    public Client login(@Valid @RequestBody Client client) throws ClientException {
+    public Client login(@Valid @RequestBody Client client) throws LoginException {
         return clientService.login(client);
     }
 
     @ResponseStatus(code=HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({ClientException.class})
-    public JSONError databaseError(HttpServletRequest req, ClientException ex) {
+    @ExceptionHandler({CadastroException.class})
+    public JSONError cadastroError(HttpServletRequest req, CadastroException ex) {
+    	return new JSONError(ex.getMessage());
+    }
+
+    @ResponseStatus(code=HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler({LoginException.class})
+    public JSONError loginError(HttpServletRequest req, LoginException ex) {
     	return new JSONError(ex.getMessage());
     }
 
