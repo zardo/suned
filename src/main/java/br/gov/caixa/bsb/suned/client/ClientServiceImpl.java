@@ -52,6 +52,5 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public Client login(Client client) throws ClientException {
     }
-    }
 
 }
