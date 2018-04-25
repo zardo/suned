@@ -3,6 +3,7 @@ package br.gov.caixa.bsb.suned.client;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.transaction.Transactional;
 
@@ -14,6 +15,7 @@ import br.gov.caixa.bsb.suned.client.ClientService;
 import br.gov.caixa.bsb.suned.phone.PhoneRepository;
 import main.java.br.gov.caixa.bsb.suned.client.exception.CadastroException;
 import main.java.br.gov.caixa.bsb.suned.client.exception.LoginException;
+import main.java.br.gov.caixa.bsb.suned.client.exception.ClientNotFoundException;
 import br.gov.caixa.bsb.suned.client.Client;
 
 public class ClientServiceImpl implements ClientService {
@@ -58,6 +60,31 @@ public class ClientServiceImpl implements ClientService {
     	
     	if (!dbClient.getPassword().equals(client.getPassword())) 
     		throw new LoginException("Usuario e/ou senha invalidos");
+    	
+    	dbClient.setLast_login(new Date());
+    	dbClient.setToken(UUID.randomUUID().toString());
+    	
+    	return dbClient;
+    }
+
+    @Override
+    @Transactional
+    public Client getClientById(String token, String id) throws LoginException, ClientNotFoundException {
+    	String[] tokenParts = token.split(" ");
+    	
+    	if (tokenParts[1] == null || tokenParts[1].equals(""))
+    		throw new LoginException("Nao autorizado");
+    	
+    	Client dbClient = clientRepository.findById(id);
+    	if (dbClient == null)
+    		throw new ClientNotFoundException("Usuario nao encontrado para o id: " + id);
+    	
+    	if (!dbClient.getToken().equals(tokenParts[1])) 
+    		throw new LoginException("Nao autorizado");
+    	
+    	long diff = (new Date()).getTime() - dbClient.getLast_login().getTime() ;
+    	if (diff > 30* 60 * 1000)
+    		throw new LoginException("Sessao invalida");
     	
     	return dbClient;
     }
