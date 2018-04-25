@@ -31,6 +31,12 @@ public class ClientController {
     @Qualifier("clientService")
     ClientService clientService;
 
+    @ResponseStatus(code=HttpStatus.OK)
+    @GetMapping(path = "")
+    public String home() {
+        return "Teste SUNED";
+    }
+
     @ResponseStatus(code=HttpStatus.CREATED)
     @PostMapping(path = "cadastro", headers={"content-type=application/json"})
     public Client register(@Valid @RequestBody Client client) throws CadastroException {
